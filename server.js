@@ -6,15 +6,25 @@ const todoPackage = grpcObject.todoPackage;
 
 const server = new grpc.Server();
 // make server listen, server needs credentials, we can bypass it for testing purpose
-server.bind("0.0.0.0:40000", grpc.ServerCredentials.createInsecure());
+server.bindAsync("0.0.0.0:40000", grpc.ServerCredentials.createInsecure(), () =>
+  server.start()
+);
 server.addService(todoPackage.Todo.service, {
   createTodo: createTodo,
   readTodos: readTodos,
 });
-server.start();
+
+const todosArray = [];
 
 function createTodo(call, callback) {
-  console.log(call);
+  const todoItem = {
+    id: todosArray.length + 1,
+    text: call.request.text,
+  };
+  todosArray.push(todoItem);
+  callback(null, todoItem);
 }
 
-function readTodos(call, callback) {}
+function readTodos(call, callback) {
+  callback(null, { items: todosArray });
+}
