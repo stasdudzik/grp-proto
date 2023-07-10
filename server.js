@@ -12,6 +12,7 @@ server.bindAsync("0.0.0.0:40000", grpc.ServerCredentials.createInsecure(), () =>
 server.addService(todoPackage.Todo.service, {
   createTodo: createTodo,
   readTodos: readTodos,
+  readTodosStream: readTodosStream,
 });
 
 const todosArray = [];
@@ -27,4 +28,9 @@ function createTodo(call, callback) {
 
 function readTodos(call, callback) {
   callback(null, { items: todosArray });
+}
+
+function readTodosStream(call, callback) {
+  todosArray.forEach((t) => call.write(t));
+  call.end();
 }

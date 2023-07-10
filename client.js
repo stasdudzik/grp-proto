@@ -16,10 +16,19 @@ client.createTodo(
     text,
   },
   (err, response) => {
-    console.log("Received from server " + JSON.stringify(response));
+    console.log("Received added TODO" + JSON.stringify(response));
   }
 );
 
-client.readTodos({}, (err, response) => {
-  console.log("Received from server " + JSON.stringify(response));
+// client.readTodos(null, (err, response) => {
+//   console.log("Received from server " + JSON.stringify(response));
+//   if (!response.items) response.items.forEach((a) => console.log(a.text));
+// });
+
+const call = client.readTodosStream();
+
+call.on("data", (item) => {
+  console.log("received item from server " + JSON.stringify(item));
 });
+
+call.on("end", (e) => console.log("server done sending!"));
